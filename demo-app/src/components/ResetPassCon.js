@@ -11,6 +11,7 @@ class ResetPassCon extends Component{
     constructor(props){
         super(props)
         this.onSubmit = this.onSubmit.bind(this)
+        this.inputFieldChange = this.inputFieldChange.bind(this)
     }
 
     
@@ -24,6 +25,12 @@ class ResetPassCon extends Component{
             this.props.history.push('/signin')
         }
     };
+
+
+    inputFieldChange(){
+        console.log('input field click')
+        this.props.clearMapStateToProps()
+    }
 
     componentWillMount(){
         console.log('yaa thats what i want')
@@ -39,10 +46,10 @@ class ResetPassCon extends Component{
                     <form onSubmit={handleSubmit(this.onSubmit)}>
                         
                         <fieldset>
-                            <Field name="password" type="password"  component={ CustomInput } label="password" placeholder="!example1234" />
+                            <Field onChange={this.inputFieldChange} name="password" type="password"  component={ CustomInput } label="password" placeholder="!example1234" />
                         </fieldset>
                         <fieldset>
-                            <Field name="confirmPassword" type="password"  component={ CustomInput } label="Confirm password" placeholder="!example1234" />
+                            <Field onChange={this.inputFieldChange} name="confirmPassword" type="password"  component={ CustomInput } label="Confirm password" placeholder="!example1234" />
                         </fieldset>
 
                             { this.props.errorMessage ? 

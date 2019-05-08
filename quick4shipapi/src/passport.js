@@ -2,6 +2,7 @@ const passport = require("passport");
 const GooglePlusTokenStrategy = require("passport-google-plus-token");
 const FacebookTokenStrategy = require("passport-facebook-token");
 const GitHubTokenStrategy = require("passport-github-token");
+const TwitterTokenStrategy = require('passport-twitter-token');
 const User = require("./models/usermodel");
 
 //Google Strategy
@@ -118,3 +119,49 @@ passport.use(
     }
   )
 );
+
+
+
+//twitter Strategy
+passport.use(
+  "twitter-token",
+  new TwitterTokenStrategy(
+    {
+      consumerKey: "Sf6dF7ZaJN0mdHqQTpJt54hhU",
+      consumerSecret: "4jNKTtKPonAGUwpCAVCtTJb7c5T37Cr7MOZVseQU40P0koT9Mh"
+    },
+    async (token, tokenSecret, profile, done) => {
+      console.log(profile)
+      console.log("accessToken", token);
+      console.log("refreshToken", tokenSecret);
+      try {
+        //Check whether this current user exist in out database
+        const existingUser = await User.findOne({ "twitter.id": profile.id });
+        if (existingUser) {
+          console.log("exist");
+          return done(null, existingUser);
+        }
+        console.log("doesent exist");
+        //if new account
+        const newUser = new User({
+          method: "twitter",
+          twitter: {
+            id: profile.id,
+            email: profile.username
+          }
+        });
+
+        await newUser.save();
+        done(null, newUser);
+      } catch (error) {
+        done(error, false, error.message);
+      }
+    }
+  )
+);
+
+
+
+
+
+

@@ -51,6 +51,61 @@ export const oauthFacebook = data => {
     }
 }
 
+export const oauthGithub = data => {
+    return async dispatch => {
+        await axios.post('http://localhost:5000/user/oauth/github', {
+            access_token: data
+        })
+        .then((res) =>{
+            console.log('res', res)
+            dispatch({
+                type: AUTH_SIGN_UP,
+                payload: res.data.token
+            })
+            
+            localStorage.setItem('token', res.data.token)
+            localStorage.setItem('method', res.data.userData.method)
+            localStorage.setItem('username', res.data.userData.username)
+            localStorage.setItem('email', res.data.userData.email)
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+            
+        })
+        .catch((err) => {
+            console.log('err', err)
+        })
+    }
+}
+
+
+export const oauthTwitter = data => {
+    return async dispatch => {
+        await axios.post('http://localhost:5000/user/oauth/twitter', {
+            oauth_token: data.oauth_token,
+            oauth_token_secret: data.oauth_token_secret
+        })
+        .then((res) =>{
+            console.log('res', res)
+            dispatch({
+                type: AUTH_SIGN_UP,
+                payload: res.data.token
+            })
+            
+            localStorage.setItem('token', res.data.token)
+            localStorage.setItem('method', res.data.userData.method)
+            localStorage.setItem('username', res.data.userData.username)
+            localStorage.setItem('email', res.data.userData.email)
+            axios.defaults.headers.common['Authorization'] = `Bearer ${res.data.token}`
+            
+        })
+        .catch((err) => {
+            console.log('err', err)
+        })
+    }
+}
+
+
+
+
 
 
 export const signUp = data =>{
@@ -232,6 +287,10 @@ export const resetRequest = data => {
                     })
                     .catch((error) => {
                         console.log(error)
+                        dispatch({
+                            type: RESET_PASSWORD_REQUEST,
+                            payload: ''
+                        })
                         dispatch({
                             type: AUTH_ERROR,
                             payload: error.response.data.message

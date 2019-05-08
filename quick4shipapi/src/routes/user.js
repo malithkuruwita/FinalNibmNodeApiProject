@@ -429,6 +429,38 @@ router
     }
   );
 
+//twitter app id -> Sf6dF7ZaJN0mdHqQTpJt54hhU
+//twitter app secret -> 4jNKTtKPonAGUwpCAVCtTJb7c5T37Cr7MOZVseQU40P0koT9Mh
+//twitter Oauth
+router
+  .route("/oauth/twitter")
+  .post(
+    passport.authenticate("twitter-token", { session: false }),
+    (req, res) => {
+      let user = req.user;
+      console.log(user)
+      if (user) {
+        let payload = { subject: user.twitter.id };
+        let token = jwt.sign(payload, "secretkey");
+        let username = user.twitter.email;
+        let userData = {
+          method: user.method,
+          username: username,
+          email: user.twitter.email
+        };
+        res.status(200).send({ token, userData });
+      } else {
+        res.status(500).send("some thing is wrong");
+      }
+    }
+  );
+
+
+ 
+
+  
+
+
 router.get("/events", (req, res) => {
   let events = [
     {

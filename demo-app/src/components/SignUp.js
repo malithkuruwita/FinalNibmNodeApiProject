@@ -8,6 +8,8 @@ import FacebookLogin from 'react-facebook-login'
 import * as actions from '../actions'
 import CustomInput from './CustomInput'
 
+import 'font-awesome/css/font-awesome.css';
+import 'bootstrap-social/bootstrap-social.css';
 
 
 class SignUp extends Component{
@@ -17,6 +19,9 @@ class SignUp extends Component{
         this.onSubmit = this.onSubmit.bind(this)
         this.responseGoogle = this.responseGoogle.bind(this)
         this.responseFacebook = this.responseFacebook.bind(this)
+        this.responseGithub = this.responseGithub.bind(this)
+        this.responseTwitter = this.responseTwitter.bind(this)
+        this.inputFieldChange = this.inputFieldChange.bind(this)
     }
 
     async onSubmit(formData){
@@ -26,6 +31,11 @@ class SignUp extends Component{
         if(!this.props.errorMessage){
             this.props.history.push('/dashboard')
         }
+    }
+
+    inputFieldChange(){
+        console.log('input field click')
+        this.props.clearMapStateToProps()
     }
 
     async responseGoogle(res){
@@ -48,10 +58,57 @@ class SignUp extends Component{
     }
 
 
+    async responseGithub(res){
+        await this.props.oauthGithub(res)
+        if(!this.props.errorMessage){
+            this.props.history.push('/dashboard')
+        }
+    }
+
+    async responseTwitter(res){
+        const uData = {
+            oauth_token: res.oauth_token,
+            oauth_token_secret: res.oauth_token_secret
+        }
+        await this.props.oauthTwitter(uData)
+        if(!this.props.errorMessage){
+            this.props.history.push('/dashboard')
+        }
+    }
+
+    
+
     componentWillMount(){
         console.log('yaa thats what i want')
         this.props.clearMapStateToProps()
     }
+
+
+
+
+    componentDidMount () {
+        const oauthScript = document.createElement("script");
+        oauthScript.src = "https://cdn.rawgit.com/oauth-io/oauth-js/c5af4519/dist/oauth.js";
+        document.body.appendChild(oauthScript);
+      }
+    
+      handleClick(e) {
+        e.preventDefault();
+        window.OAuth.initialize('bb-FDAVpwfcFhASaCQ_ZyyMO-_4');
+        window.OAuth.popup('github').done(function(result) {
+            this.responseGithub(result.access_token)
+        }.bind(this))
+      }
+
+      handleTwitterClick(e) {
+        e.preventDefault();
+        window.OAuth.initialize('bb-FDAVpwfcFhASaCQ_ZyyMO-_4');
+        window.OAuth.popup('twitter').done(function(result) {
+            this.responseTwitter(result)
+        }.bind(this))
+      }
+
+      
 
     render(){
         const { handleSubmit } = this.props
@@ -60,13 +117,13 @@ class SignUp extends Component{
                 <div className="col-xl-4 col-lg-4 col-md-4 col-div">
                     <form onSubmit={handleSubmit(this.onSubmit)}>
                         <fieldset>
-                        <Field name="username" type="text" id="username" component={ CustomInput } label="Enter your username" placeholder="example" />
+                        <Field onChange={this.inputFieldChange} name="username" type="text" id="username" component={ CustomInput } label="Enter your username" placeholder="example" />
                         </fieldset>
                         <fieldset>
-                            <Field name="email" type="text" id="email" component={ CustomInput } label="Enter your email" placeholder="example@gmail.com" />
+                            <Field onChange={this.inputFieldChange} name="email" type="text" id="email" component={ CustomInput } label="Enter your email" placeholder="example@gmail.com" />
                         </fieldset>
                         <fieldset>
-                            <Field name="password" type="password" id="password" component={ CustomInput } label="Enter your password" placeholder="!example1234" />
+                            <Field onChange={this.inputFieldChange} name="password" type="password" id="password" component={ CustomInput } label="Enter your password" placeholder="!example1234" />
                         </fieldset>
 
                             { this.props.errorMessage ? 
@@ -86,10 +143,10 @@ class SignUp extends Component{
                         <div className="d-block mb-2">
                         <FacebookLogin 
                             appId="844353635903212"
-                            textButton="Facebook"
+                            //textButton="Facebook"
                             fields="name,email,picture"
                             callback={this.responseFacebook}
-                            cssClass="btn btn-outline-primary"
+                            cssClass="btn btn-social btn-facebook"
                         />
                         </div>
                         <div className="d-block mb-2">
@@ -101,6 +158,19 @@ class SignUp extends Component{
                             className="btn btn-outline-danger"
                         />
                         </div>
+
+                        <div className="d-block mb-2">
+                        <a href="" onClick={this.handleClick.bind(this)} className="btn btn-social btn-github">
+                             <span className="fa fa-github"></span> Sign in with Github
+                        </a>
+                        </div>
+
+                        <div className="d-block mb-2">
+                        <a href="" onClick={this.handleTwitterClick.bind(this)} className="btn btn-social btn-twitter">
+                             <span className="fa fa-twitter"></span> Sign in with twitter
+                        </a>
+                        </div>
+
 
                     </div>
                 </div>
